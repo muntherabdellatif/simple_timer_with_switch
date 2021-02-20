@@ -37,7 +37,9 @@ void displayDate(){
   readHourSwitchs();
   Serial.print("On hour :"); Serial.print(onHour);
   readPeriodSwitch();
-  Serial.print("on period:");Serial.println(onPeriod);
+  Serial.print("on period:");Serial.print(onPeriod);
+  Serial.print("counter :"); Serial.print(countDownMin);
+  Serial.print(":"); Serial.println(countDownSec);
 }}
 void startRTC(){
   rtcObject.Begin();     //Starts I2C
@@ -59,7 +61,29 @@ void setRTCHour (){
 void watchTimer(){
 if (digitalRead(instrument)==0){
  RtcDateTime currentTime = rtcObject.GetDateTime();    //get the time from the RTC (new)
- if (currentTime.Hour()==onHour){
-   digitalWrite(instrument,1);
+ if (currentTime.Hour()==onHour && currentTime.Minute()==0 ){
+   digitalWrite(instrument,1);setCounter();
  } }
+}
+void setCounter(){
+ RtcDateTime currentTime = rtcObject.GetDateTime();    //get the time from the RTC   
+ if ((currentTime.Minute()+onPeriod)<60){
+       nextProgMin=0+onPeriod;
+       nextProgHour=onHour;}
+ else {nextProgMin=(0+onPeriod)%60;
+       nextProgHour=onHour+1;} 
+     countDownMin=abs(abs((currentTime.Hour()-nextProgHour ))*60 + abs(currentTime.Minute()- nextProgMin)-1) ;
+     countDownSec=59;
+}
+void watchCounter(){
+if (digitalRead(instrument)==1){
+   RtcDateTime currentTime = rtcObject.GetDateTime();    //get the time from the RTC (new)
+  RTCsec2=currentTime.Second(); 
+  if (!(lastRTCsec2==RTCsec2)){
+  if (countDownSec>0){countDownSec=countDownSec-1;} else {countDownSec=59;countDownMin=countDownMin-1;}
+  lastRTCsec2=RTCsec2;
+  }
+if (countDownSec==0 && countDownMin==0){
+    digitalWrite(instrument,0);countDownSec=0;countDownMin=0; } // pump off 
+  }
 }

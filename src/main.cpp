@@ -11,4 +11,5 @@ setRTCHour();
 void loop() {
 displayDate();
 watchTimer();
+watchCounter();
 }

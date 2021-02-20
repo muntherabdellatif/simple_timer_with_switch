@@ -6,3 +6,5 @@ void setTime();
 void displayDate();
 void setRTCHour();
 void watchTimer();
+void setCounter();
+void watchCounter();
