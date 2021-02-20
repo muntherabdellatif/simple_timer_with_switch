@@ -4,3 +4,5 @@
 void startRTC();
 void setTime();
 void displayDate();
+void setRTCHour();
+void watchTimer();

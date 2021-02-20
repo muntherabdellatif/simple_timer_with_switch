@@ -13,10 +13,9 @@ bool timedis;
 byte seccounter;  
 byte RTCmin=0;     
 byte lastRTCmin=0; 
-byte setyear=21,setmonth=1,setday=16,sethour=12,setmin=30; 
-byte onHour=10;
-byte onMin=30;
-byte onPeriod=2;
+byte setyear=21,setmonth=1,setday=16,sethour=12;
+byte onHour=0;
+byte onPeriod=0;
 byte nextProgMin=0;
 byte nextProgHour=0;
 byte countDownMin=0;
@@ -31,12 +30,15 @@ void displayDate(){
    lastRTCsec=RTCsec;
   if (timedis==1){Serial.print("date"); if (currentTime.Day()<10){Serial.print("0");}   Serial.print(currentTime.Day());
                  Serial.print("/");      if (currentTime.Month()<10){Serial.print("0");} Serial.print(currentTime.Month()); 
-                 Serial.print("/");      Serial.println(currentTime.Year()); }
+                 Serial.print("/");      Serial.print(currentTime.Year()); }
   else           {Serial.print("time"); if (currentTime.Hour()<10)  {Serial.print("0");}Serial.print(currentTime.Hour()); 
                   Serial.print(":");     if (currentTime.Minute()<10){Serial.print("0");}Serial.print(currentTime.Minute());
-                  Serial.print(":");     if (currentTime.Second()<10){Serial.print("0");}Serial.println(currentTime.Second());}
-  }
-}
+                  Serial.print(":");     if (currentTime.Second()<10){Serial.print("0");}Serial.print(currentTime.Second());}
+  readHourSwitchs();
+  Serial.print("On hour :"); Serial.print(onHour);
+  readPeriodSwitch();
+  Serial.print("on period:");Serial.println(onPeriod);
+}}
 void startRTC(){
   rtcObject.Begin();     //Starts I2C
   RtcDateTime currentTime ; //define date and time object
@@ -44,7 +46,20 @@ void startRTC(){
 }
 void setTime(){
   rtcObject.Begin();    //Starts I2C
-  RtcDateTime currentTime = RtcDateTime(setyear,setmonth,setday,sethour,setmin,0); //define date and time object
+  RtcDateTime currentTime = RtcDateTime(setyear,setmonth,setday,sethour,0,0); //define date and time object
   rtcObject.SetDateTime(currentTime); //configure the RTC with object
   currentTime = rtcObject.GetDateTime();    //get the time from the RTC 
+}
+void setRTCHour (){
+   readHourSwitchs();
+   readPeriodSwitch();
+   if (onPeriod==0){sethour=onHour;setTime();
+                    Serial.print("RTC new hour is :");Serial.println(sethour);}
+}
+void watchTimer(){
+if (digitalRead(instrument)==0){
+ RtcDateTime currentTime = rtcObject.GetDateTime();    //get the time from the RTC (new)
+ if (currentTime.Hour()==onHour){
+   digitalWrite(instrument,1);
+ } }
 }
