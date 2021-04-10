@@ -13,7 +13,7 @@ bool timedis;
 byte seccounter;  
 byte RTCmin=0;     
 byte lastRTCmin=0; 
-byte setyear=21,setmonth=1,setday=16,sethour=12;
+byte setyear=21,setmonth=1,setday=16,sethour=2,setmin=0;
 byte onHour=0;
 byte onPeriod=0;
 byte nextProgMin=0;
@@ -48,7 +48,7 @@ void startRTC(){
 }
 void setTime(){
   rtcObject.Begin();    //Starts I2C
-  RtcDateTime currentTime = RtcDateTime(setyear,setmonth,setday,sethour,0,0); //define date and time object
+  RtcDateTime currentTime = RtcDateTime(setyear,setmonth,setday,sethour,setmin,0); //define date and time object
   rtcObject.SetDateTime(currentTime); //configure the RTC with object
   currentTime = rtcObject.GetDateTime();    //get the time from the RTC 
 }
@@ -59,10 +59,14 @@ void setRTCHour (){
                     Serial.print("RTC new hour is :");Serial.println(sethour);}
 }
 void watchTimer(){
-if (digitalRead(instrument)==0){
  RtcDateTime currentTime = rtcObject.GetDateTime();    //get the time from the RTC (new)
- if (currentTime.Hour()==onHour && currentTime.Minute()==0 ){
+if (digitalRead(instrument)==0){
+   if (currentTime.Hour()==onHour && currentTime.Minute()==0 ){
    digitalWrite(instrument,1);setCounter();
+ } }
+ if (digitalRead(heater)==1) {
+   if (currentTime.Hour()==(onHour-1) && currentTime.Minute()==55 ){
+   digitalWrite(heater,0);setCounter();
  } }
 }
 void setCounter(){
@@ -84,6 +88,7 @@ if (digitalRead(instrument)==1){
   lastRTCsec2=RTCsec2;
   }
 if (countDownSec==0 && countDownMin==0){
-    digitalWrite(instrument,0);countDownSec=0;countDownMin=0; } // pump off 
+    digitalWrite(instrument,0);digitalWrite(heater,1);
+    countDownSec=0;countDownMin=0; } // pump off 
   }
 }

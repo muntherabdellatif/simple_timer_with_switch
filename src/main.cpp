@@ -7,6 +7,7 @@ pinmodefunction ();
 Serial.begin(9600);
 startRTC();
 setRTCHour();
+// setTime();  // need to delet
 }
 void loop() {
 displayDate();

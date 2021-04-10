@@ -15,8 +15,10 @@ pinMode(hoursw5,INPUT_PULLUP);
 pinMode(periodsw1,INPUT_PULLUP);
 pinMode(periodsw2,INPUT_PULLUP);
 pinMode(periodsw3,INPUT_PULLUP);
-pinMode(periodsw4,INPUT_PULLUP);
+pinMode(heater,OUTPUT);
 pinMode(instrument,OUTPUT);
+digitalWrite(heater,1);
+digitalWrite(instrument,0);
 }
 void readHourSwitchs () {
     byte hour=0;
@@ -33,6 +35,5 @@ void readPeriodSwitch(){
     if (digitalRead(periodsw1)==0){period=period+minPeriod;}
     if (digitalRead(periodsw2)==0){period=period+minPeriod*2;}
     if (digitalRead(periodsw3)==0){period=period+minPeriod*4;} 
-    if (digitalRead(periodsw4)==0){period=period+minPeriod*8;}
 onPeriod=period; 
 }
